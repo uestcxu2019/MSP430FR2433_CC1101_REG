@@ -1,5 +1,5 @@
 /*
- * _msp430fr6989_lanchpad.h
+ * _msp430fr2433_lanchpad.h
  *  HR2018.11.29
  */
 /*

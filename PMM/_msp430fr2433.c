@@ -1,5 +1,5 @@
 /*
- * _msp430fr6989_lanchpad.c
+ * _msp430fr2433_lanchpad.c
  *  HR2018.11.29
  */
 #include <PMM/_msp430fr2433.h>
