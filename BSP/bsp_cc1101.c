@@ -94,8 +94,8 @@ void CC1101_Reset(void)
 void CC1101_Init(void)
 {
     //Date rate:250kBaud,Dev:127kkHz, Mod:GFSK, RX BW:540kHz,base frequency:433MHz,optimized for current consumption
-	Write_Data(IOCFG2_ADDR,0x06);       //发送/接收到同步字时置位
-	Write_Data(IOCFG0_ADDR,0x2E);       //配置为高组态.
+	Write_Data(IOCFG2_ADDR,0x06);       //发送/接收到同步字时置位，采用默认设置即可
+	Write_Data(IOCFG0_ADDR,0x2E);       //配置为高组态
 
 	//配置为433MHz
 	Write_Data(FREQ2,0x10);             //频率控制词汇，高字节。必须配置
@@ -117,7 +117,7 @@ void CC1101_Init(void)
 	Write_Data(PKTCTRL1,0x01);
 
 	//发送输出功率配置
-	Write_Data(PATABLE,0xC0);			//输出功率控制(如若不配置则采用默认输出功率)
+	Write_Data(PATABLE,0x84);			//输出功率控制(如若不配置则采用默认输出功率)
 }
 
 
