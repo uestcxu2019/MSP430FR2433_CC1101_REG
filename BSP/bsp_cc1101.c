@@ -91,6 +91,7 @@ void CC1101_Reset(void)
 **	参	数：
 **	返回值：无
 *************************************************************************************************/
+#if		1
 void CC1101_Init(void)
 {
     //Date rate:250kBaud,Dev:127kkHz, Mod:GFSK, RX BW:540kHz,base frequency:433MHz,optimized for current consumption
@@ -109,7 +110,7 @@ void CC1101_Init(void)
 
 	Write_Data(DEVIATN,0x62);           //调制器设置.必须配置
 	Write_Data(MCSM0,0x18);             //主通信控制状态机配置.必须配置
-	Write_Data(FOCCFG,0x1D);            //频率偏移补偿配置。必须配置
+//	Write_Data(FOCCFG,0x1D);            //频率偏移补偿配置。必须配置
 
 
 	//地址匹配
@@ -120,6 +121,40 @@ void CC1101_Init(void)
 	Write_Data(PATABLE,0x84);			//输出功率控制(如若不配置则采用默认输出功率)
 }
 
+#elif	0
+
+void CC1101_Init(void)
+{
+    //Date rate:250kBaud,Dev:127kkHz, Mod:GFSK, RX BW:540kHz,base frequency:433MHz,optimized for current consumption
+//	Write_Data(IOCFG0_ADDR,0x06);       //发送/接收到同步字时置位，采用默认设置即可
+//	Write_Data(IOCFG2_ADDR,0x2E);       //配置为高组态
+
+	Write_Data(PKTCTRL0,0x05);
+
+	//配置为433MHz
+	Write_Data(FREQ2,0x10);             //频率控制词汇，高字节。必须配置
+	Write_Data(FREQ1,0xA7);             //频率控制词汇，中间字节。必须配置
+	Write_Data(FREQ0,0x62);             //频率控制词汇，低字节，必须配置
+
+	//250Kbaud
+	Write_Data(MDMCFG4,0x5B);           //调制器配置。必须配置
+	Write_Data(MDMCFG3,0xF8);           //调制器配置。必须配置
+	Write_Data(MDMCFG2,0x93);           //调制器配置。电流优化时需要配置
+
+//	Write_Data(DEVIATN,0x62);           //调制器设置.必须配置
+	Write_Data(MCSM0,0x18);             //主通信控制状态机配置.必须配置
+//	Write_Data(FOCCFG,0x1D);            //频率偏移补偿配置。必须配置
+
+
+	//地址匹配
+	//开启地址滤波
+	Write_Data(PKTCTRL1,0x01);
+
+	//发送输出功率配置
+	Write_Data(PATABLE,0x84);			//输出功率控制(如若不配置则采用默认输出功率)
+}
+
+#endif
 
 /************************************************************************************************
 **	描	述：写入数据到发送缓冲区(多字节数据)
