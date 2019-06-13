@@ -95,8 +95,8 @@ void CC1101_Reset(void)
 void CC1101_Init(void)
 {
     //Date rate:250kBaud,Dev:127kkHz, Mod:GFSK, RX BW:540kHz,base frequency:433MHz,optimized for current consumption
-	Write_Data(IOCFG2_ADDR,0x06);       //发送/接收到同步字时置位，采用默认设置即可
-	Write_Data(IOCFG0_ADDR,0x2E);       //配置为高组态
+//	Write_Data(IOCFG2_ADDR,0x06);       //发送/接收到同步字时置位，采用默认设置即可
+//	Write_Data(IOCFG0_ADDR,0x2E);       //配置为高组态
 
 	//配置为433MHz
 	Write_Data(FREQ2,0x10);             //频率控制词汇，高字节。必须配置
@@ -110,7 +110,7 @@ void CC1101_Init(void)
 
 	Write_Data(DEVIATN,0x62);           //调制器设置.必须配置
 	Write_Data(MCSM0,0x18);             //主通信控制状态机配置.必须配置
-//	Write_Data(FOCCFG,0x1D);            //频率偏移补偿配置。必须配置
+	Write_Data(FOCCFG,0x1D);            //频率偏移补偿配置。必须配置
 
 
 	//地址匹配
@@ -125,7 +125,7 @@ void CC1101_Init(void)
 
 void CC1101_Init(void)
 {
-    //Date rate:250kBaud,Dev:127kkHz, Mod:GFSK, RX BW:540kHz,base frequency:433MHz,optimized for current consumption
+    //Date rate:150kBaud,Dev:47kkHz, Mod:GFSK, RX BW:325kHz,base frequency:433MHz,optimized for current consumption
 //	Write_Data(IOCFG0_ADDR,0x06);       //发送/接收到同步字时置位，采用默认设置即可
 //	Write_Data(IOCFG2_ADDR,0x2E);       //配置为高组态
 
@@ -136,9 +136,9 @@ void CC1101_Init(void)
 	Write_Data(FREQ1,0xA7);             //频率控制词汇，中间字节。必须配置
 	Write_Data(FREQ0,0x62);             //频率控制词汇，低字节，必须配置
 
-	//250Kbaud
-	Write_Data(MDMCFG4,0x5B);           //调制器配置。必须配置
-	Write_Data(MDMCFG3,0xF8);           //调制器配置。必须配置
+	//150Kbaud
+	Write_Data(MDMCFG4,0x5C);           //调制器配置。必须配置
+	Write_Data(MDMCFG3,0x7A);           //调制器配置。必须配置,如果配置成125kbaud的速率，将0x7A改成3B即可
 	Write_Data(MDMCFG2,0x93);           //调制器配置。电流优化时需要配置
 
 //	Write_Data(DEVIATN,0x62);           //调制器设置.必须配置
@@ -150,7 +150,7 @@ void CC1101_Init(void)
 	//开启地址滤波
 	Write_Data(PKTCTRL1,0x01);
 
-	//发送输出功率配置
+	//发送输出功率配置(发射功率为0dbm)
 	Write_Data(PATABLE,0x84);			//输出功率控制(如若不配置则采用默认输出功率)
 }
 
@@ -189,7 +189,7 @@ void CC1101_RFDataPack_Send(uint8_t *pBuff, uint16_t len)
     Write_CMD(SFTX);    			//清空发送缓冲区,只能在IDLE状态下清空
     WriteTxFITO(pBuff, len);     	//写入数据到发送缓冲区
     Write_CMD(STX);     			//进入发送模式开始发送数据,初始化配置过程中已经配置好发送完成后进入空闲模式
-    Delay_us(1200);					//延时时间基于发送的数据长度，发送数据长度越短，延时时间可以设置越小
+    Delay_us(1500);					//延时时间基于发送的数据长度，发送数据长度越短，延时时间可以设置越小
 
     // 此种方式会出现卡死，耗时
 /*   while(!(P2IN&BIT1))
