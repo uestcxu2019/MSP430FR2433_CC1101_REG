@@ -110,10 +110,10 @@ void SPI_Init(void)
 uint8_t SPI_Send(uint8_t data)
 {
 	uint8_t receive_data = 0x00;	//定义一个变量作为接收数据缓存区
-
-	UCB0TXBUF = data;			//将数据写入发送缓存区
-
+	UCB0TXBUF = data;				//将数据写入发送缓存区
 	receive_data = UCB0RXBUF;		//读取收到的数据
-
 	return receive_data;
 }
+
+
+

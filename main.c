@@ -78,7 +78,7 @@
 #include "bsp_led.h"
 #include "bsp_delay.h"
 #include "bsp_uart.h"
-//#include "bsp_cs.h"
+#include "bsp_cs.h"
 
 
 #define FRAM_ADDR 0x1800
@@ -96,6 +96,7 @@ int main(void)
 	uint8_t Tx_ON[3]={0x59,0x01,0x32};   	//定义要发送的数据，用于开灯指令
 	uint8_t Tx_OFF[3]={0x59,0x02,0x35};   	//定义要发送的数据，用于关灯指令
 	uint8_t *fram;							//用于读取特定地址的数据的指针(保存数据掉电不丢失)
+
 /*************************************************************************************/
 	WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
 	PM5CTL0 &= ~LOCKLPM5;		//关闭高阻态
@@ -120,7 +121,6 @@ int main(void)
 
 	CC1101_Reset();
 	CC1101_Init();				//CC1101/CC115L有上电复位,因此此处只需要初始化即可
-//	Delay_ms(1);
 
 //	while(1)
 //	{

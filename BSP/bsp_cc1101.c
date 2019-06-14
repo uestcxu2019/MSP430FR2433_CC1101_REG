@@ -189,7 +189,7 @@ void CC1101_RFDataPack_Send(uint8_t *pBuff, uint16_t len)
     Write_CMD(SFTX);    			//清空发送缓冲区,只能在IDLE状态下清空
     WriteTxFITO(pBuff, len);     	//写入数据到发送缓冲区
     Write_CMD(STX);     			//进入发送模式开始发送数据,初始化配置过程中已经配置好发送完成后进入空闲模式
-    Delay_us(1500);					//延时时间基于发送的数据长度，发送数据长度越短，延时时间可以设置越小
+    Delay_ms(2);					//延时时间基于发送的数据长度，发送数据长度越短，延时时间可以设置越小
 
     // 此种方式会出现卡死，耗时
 /*   while(!(P2IN&BIT1))
