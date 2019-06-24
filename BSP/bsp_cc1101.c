@@ -118,7 +118,7 @@ void CC1101_Init(void)
 	Write_Data(PKTCTRL1,0x01);
 
 	//发送输出功率配置
-	Write_Data(PATABLE,0x84);			//输出功率控制(如若不配置则采用默认输出功率)
+//	Write_Data(PATABLE,0x12);			//输出功率控制(如若不配置则采用默认输出功率7dBM以上)
 }
 
 #elif	0

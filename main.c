@@ -87,14 +87,15 @@
 #define DATA_FRAM_WRITE_DISABLE 0xA503			//信息存储区写保护宏定义
 
 
+
 int main(void)
 {
 /*************************************************************************************
  *	变量定义
 *************************************************************************************/
 	//定义用于发送数据数组
-	uint8_t Tx_ON[3]={0x59,0x01,0x32};   	//定义要发送的数据，用于开灯指令
-	uint8_t Tx_OFF[3]={0x59,0x02,0x35};   	//定义要发送的数据，用于关灯指令
+	uint8_t Tx_ON[3]={0x59,0xBB,0x32};   	//定义要发送的数据，用于开灯指令
+	uint8_t Tx_OFF[3]={0x59,0xAA,0x35};   	//定义要发送的数据，用于关灯指令
 	uint8_t *fram;							//用于读取特定地址的数据的指针(保存数据掉电不丢失)
 
 /*************************************************************************************/
@@ -109,7 +110,7 @@ int main(void)
 	//用于初次判定,即未向此地址写入任何数据
 	if(*fram == 0xFF)
 	{
-		*fram = 0x01;
+		*fram = 0xAA;
 		SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
 	}
 
@@ -126,20 +127,22 @@ int main(void)
 //	{
 		/*************************************************************************************/
  	switch (*fram)
-		{
-			case 0x01:
+	{
+			case 0xAA:
 				 SYSCFG0 =  DATA_FRAM_WRITE_ENABLE;		//解除FRAM写保护及信息存储段写保护
-				 *fram = 0x02;
+				 *fram = 0xBB;
+//				 Tx_ON[1] = *fram;
 				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
 				 CC1101_RFDataPack_Send(Tx_ON, sizeof(Tx_ON));	//发送指令
 				 break;
-			case 0x02:
+			case 0xBB:
 				 SYSCFG0 =  DATA_FRAM_WRITE_ENABLE;		//解除FRAM写保护及信息存储段写保护
-				 *fram = 0x01;
+				 *fram = 0xAA;
+//				 Tx_OFF[1] = *fram;
 				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
 				 CC1101_RFDataPack_Send(Tx_OFF, sizeof(Tx_OFF));	//发送指令
 				 break;
-		}
+	}
 // 	Delay_ms(1000);
  	while(1);
 /*************************************************************************************/

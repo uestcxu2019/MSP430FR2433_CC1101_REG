@@ -31,4 +31,7 @@ void SPI_CS_LOW(void);
 void SPI_Init(void);
 uint8_t SPI_Send(uint8_t data);
 
+/*******************************************/
+//void SPI_Send(uint8_t data);
+
 #endif /* BSP_BSP_SPI_H_ */

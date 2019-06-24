@@ -99,6 +99,10 @@ void SPI_Init(void)
 	SPI_Init_Config();
 	SPI_GPIO_Config();
 //	UCB0CTLW0 &=~ UCSWRST;
+
+	//打开发送和接收中断
+	UCB0IE |= UCTXIE;
+//	UCB0IE |= UCRXIE;
 }
 
 
@@ -110,10 +114,49 @@ void SPI_Init(void)
 uint8_t SPI_Send(uint8_t data)
 {
 	uint8_t receive_data = 0x00;	//定义一个变量作为接收数据缓存区
-	UCB0TXBUF = data;				//将数据写入发送缓存区
+
+	UCB0TXBUF = data;	//将数据写入发送缓存区
+	__bis_SR_register(LPM0_bits + GIE);	//进入低功耗模式0
+
 	receive_data = UCB0RXBUF;		//读取收到的数据
+
 	return receive_data;
 }
+/***************************************************中断方式处理******************************************************************/
+
+/************************************************************************************************
+ *  说	明 : SPI发送一个字节函数
+ *  参	数 : 要发送的数据
+ *  返回值  : 无
+************************************************************************************************/
+
+/*void SPI_Send(uint8_t data)
+{
+	UCB0TXBUF = data;
+	__bis_SR_register(LPM3_bits + GIE);
+}*/
+
+
+/************************************************************************************************
+ *  说	明 : 中断服务函数
+************************************************************************************************/
+#pragma vector = USCI_B0_VECTOR
+__interrupt void USCI_B0_ISR(void)
+{
+	switch(__even_in_range(UCB0IV,4))
+	{
+		case 0:		//无中断
+			break;
+		case 2:		//接收中断
+			break;
+		case 4:		//发送中断
+			__bic_SR_register_on_exit(LPM0_bits);	//退出低功耗模式
+			break;
+		default :
+			break;
+	}
+}
+
 
 
 
