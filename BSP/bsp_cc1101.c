@@ -27,7 +27,7 @@
 **	参	数：CMD:选通指令,CC1101头文件查找
 **	返回值：无
 */
-void Write_CMD(uint8_t CMD)
+static void Write_CMD(uint8_t CMD)
 {
 	SPI_CS_LOW();						/*拉低片选*/
 //	while((GPIO_getInputPinValue(SPI_MISO_PORT, SPI_MISO_PIN)& 0x80) == GPIO_INPUT_PIN_HIGH); //等待MISO引脚为低
@@ -42,7 +42,7 @@ void Write_CMD(uint8_t CMD)
 **			Write_data:要写入的数据
 **	返回值：无
 */
-void Write_Data(uint8_t Write_Addr,uint8_t Write_data)
+static void Write_Data(uint8_t Write_Addr,uint8_t Write_data)
 {
 	SPI_CS_LOW();							/* 拉低片选 */
 //	while((GPIO_getInputPinValue(SPI_MISO_PORT, SPI_MISO_PIN)& 0x80) == GPIO_INPUT_PIN_HIGH); //等待MISO引脚为低
@@ -59,7 +59,7 @@ void Write_Data(uint8_t Write_Addr,uint8_t Write_data)
 **			Length	  :写入数据的长度
 **	返回值：无
 *************************************************************************************************/
-void Write_burst(uint8_t Write_Addr,uint8_t *pbuffer,uint8_t Length)
+static void Write_burst(uint8_t Write_Addr,uint8_t *pbuffer,uint8_t Length)
 {
 	uint8_t i = 0;
 	SPI_CS_LOW();							//拉低片选
@@ -71,6 +71,28 @@ void Write_burst(uint8_t Write_Addr,uint8_t *pbuffer,uint8_t Length)
 		SPI_Send(pbuffer[i]);				//循环发送数据
 	}
 	SPI_CS_HIGH();							//拉高片选,结束连续发送,连续发送时,必须通过拉高片选结束发送
+}
+
+
+/************************************************************************************************
+**	描	述：写入数据到发送缓冲区(多字节数据)
+**	参	数：pBuffer:要写入的数据,len:写入数据的长度
+**	返回值：无
+*************************************************************************************************/
+static void WriteTxFITO(uint8_t * pBuffer,uint8_t len)
+{
+	/*说明: 对FIFO进行数据包发送时,严格按照以下步骤执行,否则数据无法发送出去
+	*	1.第一次发送的数据必须是数据长度
+	*	2.可选发送地址字节(是否做地址识别),如果开启了地址识别,则发送的数据长度是 地址长度 + 数据长度
+	*/
+	//第一步:发送数据的长度(如果地址识别开启,则长度+1)
+	Write_Data(WRITE_SINGLE_FIFO,len+1);			//发送长度字节,长度字节不能写在要发送的数据的数组里
+
+	//第二步:可选发送地址字节
+	Write_Data(WRITE_BURST_FIFO,CC1101_UNIQUE_ADDR);			//可选发送地址字节,设置地址为0xAA
+
+	//第三步:发送数据
+	Write_burst(WRITE_BURST_FIFO,pBuffer,len);
 }
 
 
@@ -118,7 +140,7 @@ void CC1101_Init(void)
 	Write_Data(PKTCTRL1,0x01);
 
 	//发送输出功率配置
-//	Write_Data(PATABLE,0x12);			//输出功率控制(如若不配置则采用默认输出功率7dBM以上)
+	Write_Data(PATABLE,0x84);			//输出功率控制(如若不配置则采用默认输出功率7dBM以上)
 }
 
 #elif	0
@@ -155,28 +177,6 @@ void CC1101_Init(void)
 }
 
 #endif
-
-/************************************************************************************************
-**	描	述：写入数据到发送缓冲区(多字节数据)
-**	参	数：pBuffer:要写入的数据,len:写入数据的长度
-**	返回值：无
-*************************************************************************************************/
-
-void WriteTxFITO(uint8_t * pBuffer,uint8_t len)
-{
-	/*说明: 对FIFO进行数据包发送时,严格按照以下步骤执行,否则数据无法发送出去
-	*	1.第一次发送的数据必须是数据长度
-	*	2.可选发送地址字节(是否做地址识别),如果开启了地址识别,则发送的数据长度是 地址长度 + 数据长度
-	*/
-	//第一步:发送数据的长度(如果地址识别开启,则长度+1)
-	Write_Data(WRITE_SINGLE_FIFO,len+1);			//发送长度字节,长度字节不能写在要发送的数据的数组里
-
-	//第二步:可选发送地址字节
-	Write_Data(WRITE_BURST_FIFO,CC1101_UNIQUE_ADDR);			//可选发送地址字节,设置地址为0xAA
-
-	//第三步:发送数据
-	Write_burst(WRITE_BURST_FIFO,pBuffer,len);
-}
 
 
 /************************************************************************************************

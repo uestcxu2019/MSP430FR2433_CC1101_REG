@@ -77,11 +77,11 @@
 #include "bsp_cc1101.h"
 #include "bsp_led.h"
 #include "bsp_delay.h"
-#include "bsp_uart.h"
+//#include "bsp_uart.h"
 #include "bsp_cs.h"
 
 
-#define FRAM_ADDR 0x1800
+#define FRAM_ADDR 0x1800		//信息存储段地址，用于保存掉电数据
 
 #define DATA_FRAM_WRITE_ENABLE	0xA501			//信息存储区写使能宏定义
 #define DATA_FRAM_WRITE_DISABLE 0xA503			//信息存储区写保护宏定义
@@ -145,6 +145,7 @@ int main(void)
 	}
 // 	Delay_ms(1000);
  	while(1);
+// 	while(1);
 /*************************************************************************************/
 //	}
 }

@@ -27,9 +27,10 @@
 
 void SPI_CS_HIGH(void);
 void SPI_CS_LOW(void);
-
+static void SPI_GPIO_Config(void);
+static void SPI_Init_Config(void);
 void SPI_Init(void);
-uint8_t SPI_Send(uint8_t data);
+void SPI_Send(uint8_t data);
 
 /*******************************************/
 //void SPI_Send(uint8_t data);
