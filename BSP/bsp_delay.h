@@ -57,13 +57,17 @@
 
 #include "msp430fr2433.h"
 
+
 #define CPU_CLOCK		1000000			//1MHz
+
 #define Delay_us(us)	 __delay_cycles(CPU_CLOCK/1000000*(us))
 #define Delay_ms(ms) 	 __delay_cycles(CPU_CLOCK/1000*(ms))
 
+
+
 #define uint8_t   unsigned char
 #define uint16_t  unsigned int
-
+#define uint32_t  unsigned long
 
 #define _IO		  volatile				//‘ –Ì∂¡–¥
 #define _I		  volatile const		//÷ª‘ –Ì∂¡

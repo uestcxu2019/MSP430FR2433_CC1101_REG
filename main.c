@@ -76,6 +76,9 @@
  *				   Mode   : 添加放电电路(需要整流电路与能量管理电路)P3.2与NMos管连接
  *
  *
+ *				 8.Author : xuzhi Liu
+ *				   Date	  : 2019.07.19
+ *				   Mode   : 修改SMCLK时钟为4MHz
  *
  ****************************************************************************************************/
 
@@ -101,12 +104,15 @@ int main(void)
  *	变量定义
 *************************************************************************************/
 	//定义用于发送数据数组
-	uint8_t Tx_ON[3]={0x59,0xBB,0x32};   	//定义要发送的数据，用于开灯指令
-	uint8_t Tx_OFF[3]={0x59,0xAA,0x35};   	//定义要发送的数据，用于关灯指令
+	uint8_t Tx_ON[]={0x59,0xBB,0x32};   	//定义要发送的数据，用于开灯指令
+	uint8_t Tx_OFF[]={0x59,0xAA,0x35};   	//定义要发送的数据，用于关灯指令
+//	uint8_t Tx_data[]= {0x59,0xDD,0x30};	//用于测试闪灯
 	uint8_t *fram;							//用于读取特定地址的数据的指针(保存数据掉电不丢失)
+
 
 /*************************************************************************************/
 	WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
+	GPIO_LP_Init();				//GPIO低功耗引脚初始化
 	PM5CTL0 &= ~LOCKLPM5;		//关闭高阻态
 	CS_Init();					//时钟配置
 
@@ -124,39 +130,38 @@ int main(void)
 /*************************************************************************************/
 	SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//写保护使能
 
-	GPIO_LP_Init();				//GPIO低功耗引脚初始化
-	SPI_Init();					//SPI初始化
 
+	SPI_Init();					//SPI初始化
 	CC1101_Reset();
+	Delay_us(45);				//复位后至少有40us的延时
 	CC1101_Init();				//CC1101/CC115L有上电复位,因此此处只需要初始化即可
 
-//	while(1)
-//	{
-		/*************************************************************************************/
+/*************************************************************************************/
  	switch (*fram)
 	{
 			case 0xAA:
 				 SYSCFG0 =  DATA_FRAM_WRITE_ENABLE;		//解除FRAM写保护及信息存储段写保护
 				 *fram = 0xBB;
-//				 Tx_ON[1] = *fram;
-				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
 				 CC1101_RFDataPack_Send(Tx_ON, sizeof(Tx_ON));	//发送指令
+				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
 				 break;
 			case 0xBB:
 				 SYSCFG0 =  DATA_FRAM_WRITE_ENABLE;		//解除FRAM写保护及信息存储段写保护
 				 *fram = 0xAA;
-//				 Tx_OFF[1] = *fram;
-				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
 				 CC1101_RFDataPack_Send(Tx_OFF, sizeof(Tx_OFF));	//发送指令
+				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
 				 break;
 	}
 
 
 /*******************************用于释放多余的能量************************************/
- 	P3OUT |= BIT2;
- 	Delay_ms(1);
+// 	P3OUT |= BIT2;
+// 	Delay_ms(1);
  	while(1);
+/* 	{
+ 		CC1101_RFDataPack_Send(Tx_data, sizeof(Tx_data));
+ 		Delay_ms(500);
+ 	}*/
 
 /*************************************************************************************/
-//	}
 }
