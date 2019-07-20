@@ -114,8 +114,6 @@ void CC1101_Reset(void)
 void CC1101_Init(void)
 {
     //Date rate:250kBaud,Dev:127kkHz, Mod:GFSK, RX BW:540kHz,base frequency:433MHz,optimized for current consumption
-//	Write_Data(IOCFG2_ADDR,0x06);       //发送/接收到同步字时置位，采用默认设置即可
-//	Write_Data(IOCFG0_ADDR,0x2E);       //配置为高组态
 
 	//配置为433MHz
 	Write_Data(FREQ2,0x10);             //频率控制词汇，高字节。必须配置
@@ -129,8 +127,13 @@ void CC1101_Init(void)
 
 	Write_Data(DEVIATN,0x62);           //调制器设置.必须配置
 	Write_Data(MCSM0,0x18);             //主通信控制状态机配置.必须配置
+
 	Write_Data(FOCCFG,0x1D);            //频率偏移补偿配置。必须配置
 
+	Write_Data(FSCAL3,0xEA);			//频率合成器校准
+	Write_Data(FSCAL2,0x2A);			//频率合成器校准
+	Write_Data(FSCAL1,0x00);			//频率合成器校准
+	Write_Data(FSCAL0,0x1F);			//频率合成器校准
 
 	//地址匹配
 	//开启地址滤波

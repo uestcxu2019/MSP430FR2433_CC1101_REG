@@ -80,6 +80,13 @@
  *				   Date	  : 2019.07.19
  *				   Mode   : 修改SMCLK时钟为4MHz
  *
+ *
+ *				 9.Author : xuzhi Liu
+ *				   Date	  : 2019.07.20
+ *				   Mod	  : 1.修改CC1101_Init函数,添加部分寄存器初始化，优化发送距离，在版本2.5.0中，发送距离较近(4、5米左右)
+ *				   			2.修改DCO时钟为4MHz，SMCLK时钟为2MHz，本版本发送距离  > 20米
+ *				   			3.基于数据速率为250kbaud,发送功率为5dBm,433MHz
+ *
  ****************************************************************************************************/
 
 #include "msp430fr2433.h"
@@ -112,7 +119,6 @@ int main(void)
 
 /*************************************************************************************/
 	WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
-	GPIO_LP_Init();				//GPIO低功耗引脚初始化
 	PM5CTL0 &= ~LOCKLPM5;		//关闭高阻态
 	CS_Init();					//时钟配置
 
@@ -130,10 +136,9 @@ int main(void)
 /*************************************************************************************/
 	SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//写保护使能
 
-
+	GPIO_LP_Init();				//GPIO低功耗引脚初始化
 	SPI_Init();					//SPI初始化
 	CC1101_Reset();
-	Delay_us(45);				//复位后至少有40us的延时
 	CC1101_Init();				//CC1101/CC115L有上电复位,因此此处只需要初始化即可
 
 /*************************************************************************************/
@@ -142,26 +147,21 @@ int main(void)
 			case 0xAA:
 				 SYSCFG0 =  DATA_FRAM_WRITE_ENABLE;		//解除FRAM写保护及信息存储段写保护
 				 *fram = 0xBB;
-				 CC1101_RFDataPack_Send(Tx_ON, sizeof(Tx_ON));	//发送指令
 				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
+				 CC1101_RFDataPack_Send(Tx_ON, sizeof(Tx_ON));	//发送指令
 				 break;
 			case 0xBB:
 				 SYSCFG0 =  DATA_FRAM_WRITE_ENABLE;		//解除FRAM写保护及信息存储段写保护
 				 *fram = 0xAA;
-				 CC1101_RFDataPack_Send(Tx_OFF, sizeof(Tx_OFF));	//发送指令
 				 SYSCFG0 =  DATA_FRAM_WRITE_DISABLE;	//锁定信息存储段写保护,即不能写入
+				 CC1101_RFDataPack_Send(Tx_OFF, sizeof(Tx_OFF));	//发送指令
 				 break;
 	}
 
-
 /*******************************用于释放多余的能量************************************/
-// 	P3OUT |= BIT2;
-// 	Delay_ms(1);
+ 	P3OUT |= BIT2;
+ 	Delay_ms(1);
  	while(1);
-/* 	{
- 		CC1101_RFDataPack_Send(Tx_data, sizeof(Tx_data));
- 		Delay_ms(500);
- 	}*/
 
 /*************************************************************************************/
 }

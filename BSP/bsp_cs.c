@@ -14,7 +14,7 @@
 void CS_Init(void)
 {
 	//DCO配置
-	CSCTL1 = 0x37;	//配置DCO为8MHz，分频后SMCLK为4Mhz
+	CSCTL1 = 0x0035;	//配置DCO为4MHz，分频后SMCLK为2Mhz
 }
 
 
